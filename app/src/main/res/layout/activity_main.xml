@@ -24,39 +24,47 @@
         android:layout_weight="1"
         android:layout_marginTop="15dp"/>
 
+    <Button
+        android:id="@+id/ok"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="OK" />
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="50dp"
         android:orientation="horizontal">
 
         <Button
+            android:id="@+id/select"
             android:layout_width="match_parent"
             android:layout_height="50dp"
             android:layout_gravity="center"
-            android:background="@color/cardview_dark_background"
-            android:textColor="#fff"
             android:layout_weight="1"
-            android:id="@+id/select"
-            android:text="Selecionar todas"/>
+            android:background="@color/cardview_dark_background"
+            android:text="Selecionar todas"
+            android:textColor="#fff" />
+
         <Button
-            android:layout_width="match_parent"
-            android:layout_height="50dp"
-            android:layout_marginLeft="5dp"
-            android:background="@color/cardview_dark_background"
-            android:textColor="#fff"
-            android:layout_weight="1"
             android:id="@+id/deselect"
-            android:text="Limpar todas"/>
-        <Button
             android:layout_width="match_parent"
             android:layout_height="50dp"
-            android:layout_weight="1"
             android:layout_marginLeft="5dp"
+            android:layout_weight="1"
             android:background="@color/cardview_dark_background"
+            android:text="Limpar todas"
+            android:textColor="#fff" />
+
+        <Button
+            android:id="@+id/add"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:layout_marginLeft="5dp"
+            android:layout_weight="1"
+            android:background="@color/cardview_dark_background"
+            android:text="Adicionar"
             android:textColor="#fff"
-            android:id="@+id/next"
-            android:visibility="visible"
-            android:text="Adicionar"/>
+            android:visibility="visible" />
 
 
     </LinearLayout>

@@ -17,7 +17,7 @@ public class NextActivity extends AppCompatActivity {
 
         for (int i = 0; i < CustomAdapter.imageModelArrayList.size(); i++){
             if(CustomAdapter.imageModelArrayList.get(i).getSelected()) {
-                tv.setText(tv.getText() + " " + CustomAdapter.imageModelArrayList.get(i).getAnimal());
+                tv.setText(tv.getText() + " " + CustomAdapter.imageModelArrayList.get(i).getAtiv());
             }
         }
     }
