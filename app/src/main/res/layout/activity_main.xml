@@ -8,6 +8,7 @@
 
     <TextView
         android:id="@+id/user"
+        android:text="Usuario deslogado"
         android:layout_width="wrap_content"
         android:layout_height="50dp"
         android:layout_gravity="center_vertical"
@@ -28,7 +29,7 @@
         android:id="@+id/ok"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="OK" />
+        android:text="Marcar como feito" />
 
     <Button
         android:id="@+id/log_out_button"
@@ -60,7 +61,7 @@
             android:layout_marginLeft="5dp"
             android:layout_weight="1"
             android:background="@color/cardview_dark_background"
-            android:text="Limpar todas"
+            android:text="Deselecionar todas"
             android:textColor="#fff" />
 
         <Button
