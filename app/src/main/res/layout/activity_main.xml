@@ -26,6 +26,12 @@
         android:layout_marginTop="15dp"/>
 
     <Button
+        android:id="@+id/menu"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="MENU" />
+
+    <Button
         android:id="@+id/ok"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

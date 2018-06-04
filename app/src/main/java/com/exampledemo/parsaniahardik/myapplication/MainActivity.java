@@ -121,8 +121,8 @@ public class MainActivity extends Activity implements View.OnClickListener {
     private RecyclerView recyclerView;                          // Layout (Recycler View)
     private ArrayList<Model> modelArrayList;
     private CustomAdapter customAdapter;
-    private Button btnselect, btndeselect, btnadd, btnok;       // Botões (seleciona, desmarca, adiciona, ok)
-    private List<String> lista_ativ = new ArrayList<String>();  // Lista de atividades
+    private Button btnselect, btndeselect, btnadd, btnok, btnmenu;       // Botões (seleciona, desmarca, adiciona, ok)
+    private List<String> lista_ativ = new ArrayList<String>();          // Lista de atividades
     private int i = 0;
     private ArrayList<Model> list;
     private static final int RC_SIGN_IN = 0;
@@ -140,6 +140,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
         btndeselect = (Button) findViewById(R.id.deselect);
         btnadd = (Button) findViewById(R.id.add);
         btnok = (Button) findViewById(R.id.ok);
+        btnmenu = (Button) findViewById(R.id.menu);
 
         modelArrayList = getModel(false);
         customAdapter = new CustomAdapter(this,modelArrayList);
@@ -222,6 +223,14 @@ public class MainActivity extends Activity implements View.OnClickListener {
                     customAdapter = new CustomAdapter(MainActivity.this, modelArrayList);
                     recyclerView.setAdapter(customAdapter);
                 }
+            }
+        });
+
+        btnmenu.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getApplicationContext(), Menu.class);
+                startActivity(intent);
             }
         });
     }
