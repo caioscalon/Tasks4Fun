@@ -26,7 +26,7 @@ public class Login extends Activity implements View.OnClickListener {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_menu);
 
         mMainList = (RecyclerView) findViewById(R.id.recycler);
 
@@ -49,7 +49,7 @@ public class Login extends Activity implements View.OnClickListener {
                             .build(),
                     RC_SIGN_IN);
         }
-        findViewById(R.id.log_out_button).setOnClickListener(this);
+        findViewById(R.id.desconectar).setOnClickListener(this);
     }
 
     @Override
@@ -69,7 +69,7 @@ public class Login extends Activity implements View.OnClickListener {
 
     @Override
     public void onClick(View view) {
-        if(view.getId() == R.id.log_out_button){
+        if(view.getId() == R.id.desconectar){
             AuthUI.getInstance()
                     .signOut(this)
                     .addOnCompleteListener(new OnCompleteListener<Void>() {
