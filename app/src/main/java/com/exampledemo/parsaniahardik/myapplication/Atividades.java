@@ -16,10 +16,15 @@ import com.firebase.ui.auth.AuthUI;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
 public class Atividades extends Activity implements View.OnClickListener {
 
@@ -32,6 +37,11 @@ public class Atividades extends Activity implements View.OnClickListener {
     private ArrayList<Model> list;
     private static final int RC_SIGN_IN = 0;
     private FirebaseAuth auth;
+    private CollectionReference mColRef;
+    private final String ATIV_KEY = "atividade";
+    private final String PONTOS_KEY = "pontos";
+    private final String CRIANCA_KEY = "crianca";
+//    private final String ERECOMPENSA_KEY = "erecompensa?";
     private RecyclerView mMainList;
 
     @Override
@@ -52,6 +62,7 @@ public class Atividades extends Activity implements View.OnClickListener {
         customAdapter = new CustomAdapter(this,modelArrayList);
         recyclerView.setAdapter(customAdapter);
         recyclerView.setLayoutManager(new LinearLayoutManager(getApplicationContext(), LinearLayoutManager.VERTICAL, false));
+        final Map<String, Object> dataToSave = new HashMap<String, Object>();
 
         mMainList = findViewById(R.id.recycler);
 
@@ -59,8 +70,13 @@ public class Atividades extends Activity implements View.OnClickListener {
 
         if(auth.getCurrentUser() != null){
             //user already signed in
+            mColRef = FirebaseFirestore.getInstance().collection("Task4Fun").document(auth.getCurrentUser().getDisplayName()).collection("Atividades");
+            Log.d("AUTH", auth.getCurrentUser().getEmail());
             TextView textoUser = findViewById(R.id.user);
             textoUser.setText(auth.getCurrentUser().getDisplayName() + " - Atividades");
+//            modelArrayList = getModel(false);
+//            customAdapter = new CustomAdapter(MainActivity.this, modelArrayList);
+//            recyclerView.setAdapter(customAdapter);
         }
         else {
             startActivityForResult(
@@ -68,7 +84,6 @@ public class Atividades extends Activity implements View.OnClickListener {
                             .createSignInIntentBuilder()
                             .setAvailableProviders(Arrays.asList(
                                     new AuthUI.IdpConfig.EmailBuilder().build(),
-//                                    new AuthUI.IdpConfig.FacebookBuilder().build(),
                                     new AuthUI.IdpConfig.GoogleBuilder().build()))
                             .build(),
                     RC_SIGN_IN);
@@ -102,9 +117,25 @@ public class Atividades extends Activity implements View.OnClickListener {
         btnadd.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                list_atv.add("Atividade " + Integer.toString(++i));
+                String nomeAtiv = "Atividade " + Integer.toString(++i);
+                list_atv.add(nomeAtiv);
+                dataToSave.put(ATIV_KEY, nomeAtiv);
+                dataToSave.put(PONTOS_KEY, i*100);
+                dataToSave.put(CRIANCA_KEY, "Filho(a) de " + auth.getCurrentUser().getDisplayName());
+//                dataToSave.put(ERECOMPENSA_KEY, false);
+                mColRef.document().set(dataToSave).addOnCompleteListener(new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+                        if(task.isSuccessful()) {
+                            Log.d("Atividade", "Atividade foi salva com sucesso!");
+                        }
+                        else {
+                            Log.w("Atividade", "Atividade não foi salva" + task.getException());
+                        }
+                    }
+                });
                 modelArrayList = getModel(false);
-                customAdapter = new CustomAdapter(Atividades.this,modelArrayList);
+                customAdapter = new CustomAdapter(Atividades.this, modelArrayList);
                 recyclerView.setAdapter(customAdapter);
             }
         });

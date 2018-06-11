@@ -16,10 +16,15 @@ import com.firebase.ui.auth.AuthUI;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
 public class Recompensas extends Activity implements View.OnClickListener {
 
@@ -32,6 +37,11 @@ public class Recompensas extends Activity implements View.OnClickListener {
     private ArrayList<Model> list;
     private static final int RC_SIGN_IN = 0;
     private FirebaseAuth auth;
+    private CollectionReference mColRef;
+    private final String REC_KEY = "recompensa";
+    private final String PONTOS_KEY = "pontos";
+//    private final String CRIANCA_KEY = "crianca";
+//    private final String ERECOMPENSA_KEY = "erecompensa?";
     private RecyclerView mMainList;
 
     @Override
@@ -52,6 +62,7 @@ public class Recompensas extends Activity implements View.OnClickListener {
         customAdapter = new CustomAdapter(this,modelArrayList);
         recyclerView.setAdapter(customAdapter);
         recyclerView.setLayoutManager(new LinearLayoutManager(getApplicationContext(), LinearLayoutManager.VERTICAL, false));
+        final Map<String, Object> dataToSave = new HashMap<String, Object>();
 
         mMainList = findViewById(R.id.recycler);
 
@@ -59,6 +70,8 @@ public class Recompensas extends Activity implements View.OnClickListener {
 
         if(auth.getCurrentUser() != null){
             //user already signed in
+            mColRef = FirebaseFirestore.getInstance().collection("Task4Fun").document(auth.getCurrentUser().getDisplayName()).collection("Recompensa");
+            Log.d("AUTH", auth.getCurrentUser().getEmail());
             TextView textoUser = findViewById(R.id.user);
             textoUser.setText(auth.getCurrentUser().getDisplayName() + " - Recompensas");
         }
@@ -68,7 +81,6 @@ public class Recompensas extends Activity implements View.OnClickListener {
                             .createSignInIntentBuilder()
                             .setAvailableProviders(Arrays.asList(
                                     new AuthUI.IdpConfig.EmailBuilder().build(),
-//                                    new AuthUI.IdpConfig.FacebookBuilder().build(),
                                     new AuthUI.IdpConfig.GoogleBuilder().build()))
                             .build(),
                     RC_SIGN_IN);
@@ -102,7 +114,23 @@ public class Recompensas extends Activity implements View.OnClickListener {
         btnadd.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                list_rec.add("Recompensa " + Integer.toString(++i));
+                String nomeRec = "Recompensa " + Integer.toString(++i);
+                list_rec.add(nomeRec);
+                dataToSave.put(REC_KEY, nomeRec);
+                dataToSave.put(PONTOS_KEY, i*100);
+//                dataToSave.put(CRIANCA_KEY, "Filho(a) de " + auth.getCurrentUser().getDisplayName());
+//                dataToSave.put(ERECOMPENSA_KEY, false);
+                mColRef.document().set(dataToSave).addOnCompleteListener(new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+                        if(task.isSuccessful()) {
+                            Log.d("Recompensa", "Recompensa foi salva com sucesso!");
+                        }
+                        else {
+                            Log.w("Recompensa", "Recompensa não foi salva" + task.getException());
+                        }
+                    }
+                });
                 modelArrayList = getModel(false);
                 customAdapter = new CustomAdapter(Recompensas.this,modelArrayList);
                 recyclerView.setAdapter(customAdapter);
