@@ -14,11 +14,18 @@ import android.widget.Toast;
 
 import com.firebase.ui.auth.AuthUI;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.Query;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
+
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -37,11 +44,14 @@ public class Atividades extends Activity implements View.OnClickListener {
     private ArrayList<Model> list;
     private static final int RC_SIGN_IN = 0;
     private FirebaseAuth auth;
+    private FirebaseFirestore firestore;
     private CollectionReference mColRef;
     private final String ATIV_KEY = "atividade";
     private final String PONTOS_KEY = "pontos";
     private final String CRIANCA_KEY = "crianca";
-//    private final String ERECOMPENSA_KEY = "erecompensa?";
+    private final String FEITO_KEY = "foiFeito";
+    private String nomeAtividade;
+    private boolean foiFeito;
     private RecyclerView mMainList;
 
     @Override
@@ -67,15 +77,46 @@ public class Atividades extends Activity implements View.OnClickListener {
         mMainList = findViewById(R.id.recycler);
 
         auth = FirebaseAuth.getInstance();
+        firestore = FirebaseFirestore.getInstance();
 
         if(auth.getCurrentUser() != null){
             //user already signed in
-            mColRef = FirebaseFirestore.getInstance().collection("Task4Fun").document(auth.getCurrentUser().getDisplayName()).collection("Atividades");
+            mColRef = firestore.collection("Task4Fun").document(auth.getCurrentUser().getDisplayName()).collection("Atividades");
             Log.d("AUTH", auth.getCurrentUser().getEmail());
             TextView textoUser = findViewById(R.id.user);
             textoUser.setText(auth.getCurrentUser().getDisplayName() + " - Atividades");
+            mColRef.get()
+                    .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                        @Override
+                        public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                            if (task.isSuccessful()) {
+                                for (QueryDocumentSnapshot document : task.getResult()) {
+                                    Log.d("FIRESTORE", document.getId() + " => " + document.getData());
+                                    foiFeito = false;
+                                    for (Map.Entry<String,Object> entry : document.getData().entrySet()) {
+                                        if(entry.getKey().equals("atividade")) {
+                                            nomeAtividade = entry.getValue().toString();
+                                        }
+                                        else if(entry.getKey().equals("foiFeito") && entry.getValue().toString().equals("true")) {
+                                            foiFeito = true;
+                                        }
+                                    }
+                                    if(foiFeito == false) {
+                                        list_atv.add(nomeAtividade);
+                                        Log.d("LOAD_ITEM", nomeAtividade);
+                                        modelArrayList = getModel(false);
+                                        customAdapter = new CustomAdapter(Atividades.this, modelArrayList);
+                                        recyclerView.setAdapter(customAdapter);
+                                    }
+//                                    list_atv.add(document.getData().getString("atividade"));
+                                }
+                            } else {
+                                Log.d("FIRESTORE", "Error getting documents: ", task.getException());
+                            }
+                        }
+                    });
 //            modelArrayList = getModel(false);
-//            customAdapter = new CustomAdapter(MainActivity.this, modelArrayList);
+//            customAdapter = new CustomAdapter(Atividades.this, modelArrayList);
 //            recyclerView.setAdapter(customAdapter);
         }
         else {
@@ -122,12 +163,13 @@ public class Atividades extends Activity implements View.OnClickListener {
                 dataToSave.put(ATIV_KEY, nomeAtiv);
                 dataToSave.put(PONTOS_KEY, i*100);
                 dataToSave.put(CRIANCA_KEY, "Filho(a) de " + auth.getCurrentUser().getDisplayName());
-//                dataToSave.put(ERECOMPENSA_KEY, false);
+                dataToSave.put(FEITO_KEY, false);
+//                Log.d("Document_name", );
                 mColRef.document().set(dataToSave).addOnCompleteListener(new OnCompleteListener<Void>() {
                     @Override
                     public void onComplete(@NonNull Task<Void> task) {
                         if(task.isSuccessful()) {
-                            Log.d("Atividade", "Atividade foi salva com sucesso!");
+                            Log.d("Atividade", "Atividade foi salva com sucesso!\n" + task.getResult());
                         }
                         else {
                             Log.w("Atividade", "Atividade não foi salva" + task.getException());
@@ -146,13 +188,17 @@ public class Atividades extends Activity implements View.OnClickListener {
                 String atividades = "";
                 int tam = list_atv.size();
                 int n = 0;
+                Query query;
                 for (int i = tam - 1; i >= 0; i--) {
                     if (list.get(i).getSelected()) {
                         atividades = list.get(i).getAtiv() + "\n" + atividades;
                         list_atv.remove(i);
+//                        query = mColRef.whereEqualTo("atividade", list.get(i).getAtiv());
+//                        query.update()
                         n++;
                     }
                 }
+
                 if (tam > 0 && n > 0) {
                     Toast.makeText(Atividades.this, atividades, Toast.LENGTH_SHORT).show();
                     modelArrayList = getModel(false);

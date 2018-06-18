@@ -26,6 +26,7 @@ class Model {
 
     private boolean isSelected;
     private String atividade;
+    private String id;
 
     public String getAtiv() {
         return atividade;
@@ -41,6 +42,14 @@ class Model {
 
     public void setSelected(boolean selected) {
         isSelected = selected;
+    }
+
+    public String getID() {
+        return id;
+    }
+
+    public void setID(String id) {
+        this.id = id;
     }
 }
 
